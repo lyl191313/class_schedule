@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程快速查询 - 手机版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+        }
+        
+        .week-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 18px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+        
+        .week-input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            background: white;
+        }
+        
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .week-group-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-1 {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+        }
+        
+        .btn-2 {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+        
+        .btn-3 {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+            color: white;
+        }
+        
+        .btn-4 {
+            background: linear-gradient(45deg, #FF5722, #E64A19);
+            color: white;
+        }
+        
+        .week-group-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .result {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result-header {
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+        }
+        
+        .course-item {
+            background: white;
+            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .course-time {
+            font-weight: bold;
+            color: #2196F3;
+            font-size: 14px;
+        }
+        
+        .course-info {
+            margin-top: 5px;
+            color: #333;
+        }
+        
+        .course-teacher {
+            color: #666;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+        
+        .no-course {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        .tips {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .tips h4 {
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+        
+        .tips p {
+            color: #424242;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result.show {
+            animation: fadeIn 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 课程查询</h1>
+            <p>天鹅湖小学 - 吴维雯老师专属课程表</p>
+        </div>
+        
+        <div class="search-box">
+            <input type="number" 
+                   class="week-input" 
+                   id="weekInput" 
+                   placeholder="输入周数 (如: 5)"
+                   min="1" 
+                   max="20">
+        </div>
+        
+        <div class="quick-buttons">
+            <button class="week-group-btn btn-1" onclick="showWeekGroup(1)">
+                第2,6,10,14,18周
+            </button>
+            <button class="week-group-btn btn-2" onclick="showWeekGroup(2)">
+                第3,7,11,15,19周
+            </button>
+            <button class="week-group-btn btn-3" onclick="showWeekGroup(3)">
+                第4,8,12,16周
+            </button>
+            <button class="week-group-btn btn-4" onclick="showWeekGroup(4)">
+                第5,9,13,17周
+            </button>
+        </div>
+        
+        <div class="result" id="result">
+            <div class="result-header" id="resultHeader"></div>
+            <div id="courseList"></div>
+        </div>
+        
+        <div class="tips">
+            <h4>💡 使用提示</h4>
+            <p>• 直接输入周数查询具体课程<br/>
+               • 点击彩色按钮查看整组周次<br/>
+               • 星期四课程最多，星期三最少</p>
+        </div>
+    </div>
+
+    <script>
+        const scheduleData = {
+            1: { // 第2,6,10,14,18周
+                weeks: [2,6,10,14,18],
+                name: "蓝色课程表",
+                courses: [
+                    {time: "第2节 (9:30-10:10)", day: "星期四", subject: "心理", teacher: "李老师1-6"},
+                    {time: "第3节 (10:40-11:15)", day: "星期四", subject: "心理", teacher: "李老师1-8"},
+                    {time: "第5节 (14:00-14:35)", day: "星期二", subject: "心理", teacher: "张老师1-11"},
+                    {time: "第5节 (14:00-14:35)", day: "星期四", subject: "心理", teacher: "李老师1-4"},
+                    {time: "第5节 (14:00-14:35)", day: "星期五", subject: "心理", teacher: "何老师1-1"},
+                    {time: "第6节 (14:50-15:30)", day: "星期一", subject: "心理", teacher: "张老师1-12"},
+                    {time: "第6节 (14:50-15:30)", day: "星期二", subject: "心理", teacher: "何老师1-2"},
+                    {time: "第6节 (14:50-15:30)", day: "星期四", subject: "心理", teacher: "李老师1-7"}
+                ]
+            },
+            2: { // 第3,7,11,15,19周
+                weeks: [3,7,11,15,19],
+                name: "绿色课程表",
+                courses: [
+                    {time: "第2节 (9:30-10:10)", day: "星期二", subject: "心理", teacher: "李老师1-3"},
+                    {time: "第2节 (9:30-10:10)", day: "星期四", subject: "心理", teacher: "李老师1-10"},
+                    {time: "第3节 (10:40-11:15)", day: "星期五", subject: "心理", teacher: "庞老师1-22"},
+                    {time: "第5节 (14:00-14:35)", day: "星期一", subject: "心理", teacher: "王老师1-14"},
+                    {time: "第5节 (14:00-14:35)", day: "星期二", subject: "心理", teacher: "王老师1-16"},
+                    {time: "第5节 (14:00-14:35)", day: "星期四", subject: "心理", teacher: "曾老师1-18"},
+                    {time: "第5节 (14:00-14:35)", day: "星期五", subject: "心理", teacher: "庞老师1-21"},
+                    {time: "第6节 (14:50-15:30)", day: "星期四", subject: "心理", teacher: "王老师1-15"}
+                ]
+            },
+            3: { // 第4,8,12,16周
+                weeks: [4,8,12,16],
+                name: "黄色课程表",
+                courses: [
+                    {time: "第1节 (8:40-9:20)", day: "星期四", subject: "心理", teacher: "李老师1-9"},
+                    {time: "第2节 (9:30-10:10)", day: "星期四", subject: "心理", teacher: "王老师1-13"},
+                    {time: "第4节 (11:30-12:10)", day: "星期三", subject: "心理", teacher: "李老师1-23"},
+                    {time: "第5节 (14:00-14:35)", day: "星期二", subject: "心理", teacher: "曾老师1-17"},
+                    {time: "第5节 (14:00-14:35)", day: "星期四", subject: "心理", teacher: "胡老师1-20"},
+                    {time: "第6节 (14:50-15:30)", day: "星期二", subject: "心理", teacher: "庞老师1-5"},
+                    {time: "第6节 (14:50-15:30)", day: "星期四", subject: "心理", teacher: "李老师1-26"}
+                ]
+            },
+            4: { // 第5,9,13,17周
+                weeks: [5,9,13,17],
+                name: "橙色课程表",
+                courses: [
+                    {time: "第2节 (9:30-10:10)", day: "星期四", subject: "心理", teacher: "李老师1-24"},
+                    {time: "第3节 (10:40-11:15)", day: "星期四", subject: "心理", teacher: "胡老师1-19"},
+                    {time: "第4节 (11:30-12:10)", day: "星期一", subject: "心理", teacher: "刘老师1-31"},
+                    {time: "第4节 (11:30-12:10)", day: "星期二", subject: "心理", teacher: "何老师1-29"},
+                    {time: "第4节 (11:30-12:10)", day: "星期三", subject: "心理", teacher: "周老师1-28"},
+                    {time: "第5节 (14:00-14:35)", day: "星期四", subject: "心理", teacher: "李老师1-25"},
+                    {time: "第6节 (14:50-15:30)", day: "星期二", subject: "心理", teacher: "周老师1-27"},
+                    {time: "第6节 (14:50-15:30)", day: "星期四", subject: "心理", teacher: "何老师1-30"}
+                ]
+            }
+        };
+        
+        document.getElementById('weekInput').addEventListener('input', function() {
+            const week = parseInt(this.value);
+            if (week >= 1 && week <= 20) {
+                queryByWeek(week);
+            } else {
+                hideResult();
+            }
+        });
+        
+        function queryByWeek(week) {
+            let foundGroup = null;
+            
+            for (let group in scheduleData) {
+                if (scheduleData[group].weeks.includes(week)) {
+                    foundGroup = group;
+                    break;
+                }
+            }
+            
+            if (foundGroup) {
+                showResult(foundGroup, `第${week}周课程安排`);
+            } else {
+                showNoResult(`第${week}周暂无课程安排`);
+            }
+        }
+        
+        function showWeekGroup(group) {
+            const data = scheduleData[group];
+            const weekList = data.weeks.join('、');
+            showResult(group, `第${weekList}周课程安排`);
+        }
+        
+        function showResult(group, title) {
+            const data = scheduleData[group];
+            const resultEl = document.getElementById('result');
+            const headerEl = document.getElementById('resultHeader');
+            const listEl = document.getElementById('courseList');
+            
+            headerEl.textContent = title;
+            
+            if (data.courses.length === 0) {
+                listEl.innerHTML = '<div class="no-course">暂无课程安排</div>';
+            } else {
+                let html = '';
+                data.courses.forEach(course => {
+                    html += `
+                        <div class="course-item">
+                            <div class="course-time">${course.time}</div>
+                            <div class="course-info">${course.day} - ${course.subject}</div>
+                            <div class="course-teacher">${course.teacher}</div>
+                        </div>
+                    `;
+                });
+                listEl.innerHTML = html;
+            }
+            
+            resultEl.classList.add('show');
+        }
+        
+        function showNoResult(message) {
+            const resultEl = document.getElementById('result');
+            const headerEl = document.getElementById('resultHeader');
+            const listEl = document.getElementById('courseList');
+            
+            headerEl.textContent = message;
+            listEl.innerHTML = '<div class="no-course">本周无课程安排</div>';
+            
+            resultEl.classList.add('show');
+        }
+        
+        function hideResult() {
+            const resultEl = document.getElementById('result');
+            resultEl.classList.remove('show');
+        }
+        
+        // 页面加载时的欢迎提示
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                const resultEl = document.getElementById('result');
+                const headerEl = document.getElementById('resultHeader');
+                const listEl = document.getElementById('courseList');
+                
+                headerEl.textContent = '🎯 快速开始';
+                listEl.innerHTML = `
+                    <div class="course-item">
+                        <div class="course-info">输入周数或点击按钮查询课程</div>
+                        <div class="course-teacher">例如：输入"5"查看第5周的课程</div>
+                    </div>
+                `;
+                resultEl.classList.add('show');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
